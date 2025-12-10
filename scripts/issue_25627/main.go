@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-
+	"github.com/!azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v7"
 )
 
