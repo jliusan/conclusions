@@ -14,7 +14,41 @@ import (
 
 func main() {
 	// TestExampleContainerAppsClient_BeginCreateOrUpdate()
-	ExampleContainerAppsClient_NewListBySubscriptionPager()
+	// ExampleContainerAppsClient_NewListBySubscriptionPager()
+	testUserCode()
+}
+
+func testUserCode() {
+	cred, err := azidentity.NewDefaultAzureCredential(nil)
+	if err != nil {
+		log.Fatalf("failed to obtain a credential: %v", err)
+	}
+	ctx := context.Background()
+	f, err := armappcontainers.NewClientFactory("4d042dc6-fe17-4698-a23f-ec6a8d1e98f4", cred, &arm.ClientOptions{
+		ClientOptions: policy.ClientOptions{
+			Logging: policy.LogOptions{
+				// include HTTP body for log
+				IncludeBody: true,
+			},
+		},
+	})
+	if err != nil {
+		log.Fatalf("failed to create client: %v", err)
+	}
+	containerAppsPager := f.NewContainerAppsClient().NewListBySubscriptionPager(&armappcontainers.ContainerAppsClientListBySubscriptionOptions{})
+
+	for containerAppsPager.More() {
+		containerAppsPage, err := containerAppsPager.NextPage(ctx)
+		if err != nil {
+			log.Fatalf("failed to advance page: %v", err)
+		}
+		for _, containerApp := range containerAppsPage.Value {
+			if containerApp.Identity == nil {
+				panic("find nil identity ")
+			}
+			fmt.Printf("Container App Name: %s\n identity.Type:%v  ", *containerApp.Name, *containerApp.Identity.Type)
+		}
+	}
 }
 
 func ExampleContainerAppsClient_NewListBySubscriptionPager() {
